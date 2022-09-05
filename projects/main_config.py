@@ -18,7 +18,7 @@ data_folder = os.path.expanduser(os.environ.get('DATA_FOLDER',
 
 # number of workers:
 # Define the number of workers to load data while training the model and running model predictions.
-num_workers = os.environ.get('NUM_WORKERS', 8)
+num_workers = int(os.environ.get('NUM_WORKERS', 8))
 
 # device:
 # Define which device is available and should be used
