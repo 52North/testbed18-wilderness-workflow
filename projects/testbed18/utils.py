@@ -64,7 +64,9 @@ def load_trainer():
     :return: loaded trainer object
     """
 
-    return ttorch.train.ClassTrainer().load(log_dir=config.log_path, device=config.device)
+    trainer = ttorch.train.ClassTrainer().load(log_dir=config.log_path, device=config.device)
+    trainer.datamodule.folder = config.data_folder_tiles
+    return trainer
 
 
 def load_asos():
