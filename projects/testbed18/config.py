@@ -52,3 +52,6 @@ data_folder_raw = main_config.anthroprotect_data_folder_raw
 data_folder_tiles = main_config.anthroprotect_data_folder_tiles
 data_folder_investigative = main_config.anthroprotect_data_folder_investigative
 file_infos_path_raw = main_config.anthroprotect_file_infos_path_raw
+
+# server
+server_url = main_config.server_url
