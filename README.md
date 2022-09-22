@@ -6,7 +6,7 @@ Based on: https://gitlab.jsc.fz-juelich.de/kiste/asos
 
 ## Installation/prerequisites
 
-Install `tlib` (note: do not install via pip because there is different library with this name):
+Install `tlib` (note: do not install via `pip install tlib` because there is different library with this name):
 ```
 pip install git+https://gitlab.jsc.fz-juelich.de/kiste/asos@main
 ```
