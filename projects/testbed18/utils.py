@@ -179,9 +179,25 @@ def predict_activation_maps(*files, batch_size: int = config.batch_size, disable
         disable_tqdm=disable_tqdm
     )
 
+    # ----------------------------
+    dataset_kwargs = {
+        'channels': None,
+        'x_normalization': (0, 10000),
+        'clip_range': (0, 1),
+        'y_normalization': None,
+        'n_classes': 1,
+        'use_rasterio': True,
+        'rgb_channels': [2, 1, 0],
+        'val_range': (0, 1024)
+    }
+
+    labels = [0] * len(files)
+    dataset = ttorch.data.images.Dataset(files=files, labels=labels, **dataset_kwargs)
+    # dataset = trainer.datamodule.get_dataset(files, prepend_folder=check_if_prepend_folder(*files))
+
     preds = ttorch.utils.predict_dataset(
         model=model,
-        dataset=trainer.datamodule.get_dataset(files, prepend_folder=check_if_prepend_folder(*files)),
+        dataset=dataset,
         batch_size=batch_size,
         num_workers=config.num_workers,
         disable_tqdm=disable_tqdm,
@@ -248,6 +264,195 @@ def predict_osm(*files, patch_size: int = 8, stride: int = 4):
     osms = np.array(osms)
 
     return - osms
+
+
+class GenericS2Plotter:
+    """
+    Generic S2 plotter
+    Works with file paths or arrays
+    """
+    def __init__(self, val_range_s2: tuple = (0, 2**10)):
+
+        self.channel_indices = {'B2': 0, 'B3': 1, 'B4': 2, 'B5': 3, 'B6': 4,
+                                'B7': 5, 'B8': 6, 'B8A': 7, 'B11': 8, 'B12': 9}
+        self.channel_names = ('B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12')
+        self.val_range_s2 = val_range_s2
+        self.cmap_mask = 'gray'
+        self.cmap_ndvi = 'RdYlGn'
+
+    def get_array(self, image, channels: list = None, val_range=None, transpose: bool = False):
+        """
+        Returns an array of the given geotif file of the given channels with the shape (channels, width, height).
+        If transpose is True, the shape is (width, height, channels). If val_range is defined the array is normalized.
+
+        :param file: path to tif file
+        :param channels: indices or channel names, e.g. of red, green and blue channel
+        :param val_range: tuple (min, max) of min and max values that are then set to 0 and 1; if val_range
+            is None, the array will not be normalized; if val_range is 'auto' the min and max value are found
+        :param transpose: transposes shape from (channels, width, height) to (width, height, channels); if there is
+            only one channel, this dimension is skipped
+        :return: numpy array
+        """
+
+        channel_names = self.channel_names
+
+        # filter for given channels
+        if channels is not None:
+
+            if not isinstance(channels, list):  # if channels is not a list transform it to list
+                channels = [channels]
+
+            # if channels contains strings, compare them to channel names and transfer them to indices
+            channels = [
+                channel_names.index(channel)
+                if isinstance(channel, str)
+                else channel
+                for channel in channels
+            ]
+
+            image = image[channels]
+
+        # normalize if val_range is given
+        if val_range is not None:
+
+            if val_range == 'auto':
+                # transform so that min_value becomes 0 and max_value becomes 1
+                min_value = np.min(image)
+                max_value = np.max(image)
+
+            else:
+                min_value, max_value = val_range
+                image = image.clip(min=min_value, max=max_value)
+
+            image = (image - min_value) / (max_value - min_value)
+
+        # transpose so that channel dimension is last (and not first), if transpose is True
+        if transpose:
+            if len(image) == 1:
+                image = image[0]  # skip first dimension since there is only one channel
+            else:
+                image = image.transpose(1, 2, 0)  # put channels from first to last dimension
+
+        return image
+
+    def plot_image(self, image, channels, val_range='auto', ax=None, **imshow_kwargs):
+        """
+        Returns a figure in which an rgb image of a GeoTif is plotted.
+
+        :param file: path to tif file
+        :param channels: indices or channel names of red, green and blue channel OR single channel for grey scale image
+        :param val_range: tuple (min, max) of min and max values that are plotted as black and white
+        :param ax: matplotlib axis; if None a new figure is created; else only ax is returned
+        :return: (fig, ax) if ax is None; else only ax
+        """
+
+        array = self.get_array(image=image, channels=channels, val_range=val_range, transpose=True)
+        return tutils.plots.plot_original_image_size(array=array, ax=ax, **imshow_kwargs)
+
+    def plot(
+        self,
+        images,
+
+        plot_s2: bool = True,
+        plot_s2_channels: bool = True,
+        plot_scl_without_artifacts: bool = False,
+        plot_lcs: bool = False,
+        plot_legends: bool = False,
+        plot_masks: bool = False,
+
+        fig_height: float = 4.6,
+        origin: str = 'upper',
+        ncols: int = 5,
+        cmap: str = 'gray',
+        **fig_kwargs
+    ):
+        """
+        Plots using matplotlib and plt.show(). No figure or axis is returned.
+
+        :param file: file name or file dir
+        :param plot_s2: bool if the following is plotted from Sentinel-2 image: rgb, false color, scl, ndvi, evi;
+            note, that the scl plot might have artifacts
+        :param s2_channels: bool if all channels of Sentinel-2 image are plotted individually
+        :param plot_scl_without_artifacts: bool if scl is plotted again, without artifacts
+        :param plot_lcs: bool if land cover data is plotted
+        :param plot_masks: bool if masks are plotted
+        :param fig_height: height of the plotted figures
+        :return:
+        """
+
+        # plot s2 channels
+        if plot_s2_channels:
+            n_channels = len(images)
+            nrows = int(np.ceil(n_channels / ncols))
+
+            fig = plt.figure(**fig_kwargs)
+            for count, image in enumerate(images):
+                ax = fig.add_subplot(nrows, ncols, count + 1)
+                ax.imshow(image, origin=origin, cmap=cmap)
+
+                ax.axis(False)
+                ax.set_title(self.channel_names[count])
+
+            fig.tight_layout()
+            plt.show()
+
+        # plot s2
+        if plot_s2:
+            fig, axs = plt.subplots(1, 5, figsize=(fig_height * 5, fig_height))
+
+            # rgb image
+            try:  # with channel names
+                axs[0] = self.plot_image(
+                    image=images, channels=['B4', 'B3', 'B2'], val_range=self.val_range_s2, ax=axs[0])
+            except:  # use channel indices
+                channels = [self.channel_indices['B4'], self.channel_indices['B3'], self.channel_indices['B2']]
+                axs[0] = self.plot_image(image=images, channels=channels, val_range=self.val_range_s2, ax=axs[0])
+
+            axs[0].set_title('RGB')
+
+            # false color image
+            try:  # with channel names
+                axs[1] = self.plot_image(
+                    image=images, channels=['B8', 'B4', 'B3'], val_range=self.val_range_s2, ax=axs[1])
+            except:  # use channel indices
+                channels = [self.channel_indices['B8'], self.channel_indices['B4'], self.channel_indices['B3']]
+                axs[1] = self.plot_image(image=images, channels=channels, val_range=self.val_range_s2, ax=axs[1])
+
+            axs[1].set_title('NIR-R-G')
+
+            # ndvi
+            try:  # with channel names
+                image = self.get_array(image=images, channels=('B8', 'B4'))
+            except:  # use channel indices
+                channels = [self.channel_indices['B8'], self.channel_indices['B4']]
+                image = self.get_array(image=images, channels=channels)
+
+            ndvi = tgeo.utils.get_ndvi(nir=image[0], red=image[1])
+
+            axs[2] = tutils.plots.plot_original_image_size(
+                array=ndvi, plot_cbar=True, cmap=self.cmap_ndvi, vmin=-1, vmax=1, fig=fig, ax=axs[2])
+            axs[2].set_title('NDVI')
+
+            # evi
+            try:  # with channel names
+                image = self.get_array(image=images, channels=('B8', 'B4', 'B2'))
+            except:  # use channel indices
+                channels = [self.channel_indices['B8'], self.channel_indices['B4'], self.channel_indices['B2']]
+                image = self.get_array(image=images, channels=channels)
+
+            evi = tgeo.utils.get_evi(nir=image[0], red=image[1], blue=image[2])
+
+            q = 0.02
+
+            axs[3] = tutils.plots.plot_original_image_size(
+                array=evi,
+                plot_cbar=True,
+                cmap=self.cmap_ndvi,
+                vmin=np.quantile(evi, q=q),
+                vmax=np.quantile(evi, q=1-q),
+                fig=fig,
+                ax=axs[3])
+            axs[3].set_title('EVI')
 
 
 class Plotter:
