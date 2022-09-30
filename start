@@ -1,1 +1,5 @@
+#!/bin/bash
+
 export PYTHONPATH="${PYTHONPATH}:/home/jovyan/work/workspace"
+
+exec "$@"
