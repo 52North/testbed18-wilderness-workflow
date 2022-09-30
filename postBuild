@@ -1,11 +1,77 @@
-set -e
+#!/bin/bash
 
-# Install Python libraries
+#set -e
+
+## Install Python libraries
+
 # gdal
 export CPLUS_INCLUDE_PATH=/usr/include/gdal
 export C_INCLUDE_PATH=/usr/include/gdal
 python -m pip install GDAL==2.2.3
+
 # pytorch
 python -m pip install --no-cache-dir torch
+
 # tlib
-python -m pip install git+https://gitlab.jsc.fz-juelich.de/kiste/asos@main
+#python -m pip install git+https://gitlab.jsc.fz-juelich.de/kiste/asos@main
+git clone https://gitlab.jsc.fz-juelich.de/kiste/asos.git
+cd asos
+cat << EOF > setup.py
+from setuptools import setup
+
+
+setup(
+    name='tlib',
+    version='1.0',
+    description='This code belongs to the research article "Exploring Wilderness Using Explainable Machine Learning in Satellite Imagery" (2022) by Timo T. Stomberg, Taylor Stone, Johannes Leonhardt, Immanuel Weber, and Ribana Roscher (https://doi.org/10.48550/arXiv.2203.00379).',
+    license='MIT',
+    author='Timo Tjaden Stomberg',
+    author_email='timo.stomberg@uni-bonn.de',
+    url='https://gitlab.com/timo.stomberg/tlib',
+    packages=[
+        'tlib',
+
+        'tlib/tgeo',
+        'tlib/tgeo/gee',
+
+        'tlib/tlearn',
+        'tlib/tlearn/data',
+        'tlib/tlearn/interpret',
+
+        'tlib/ttorch',
+        'tlib/ttorch/data',
+        'tlib/ttorch/modules',
+
+        'tlib/tutils',
+    ],
+
+    install_requires=[
+        'gdal',
+
+        'numpy',
+        'pandas',
+        'scikit-learn',
+        'matplotlib',
+        'ipympl',
+        'tqdm',
+
+        'jupyter_contrib_nbextensions',
+
+        'rasterio',
+        'imageio',
+        'ipyleaflet',
+        'simplekml',
+
+        'plotly',
+
+        'torch',
+        'torchvision',
+        'torchaudio',
+
+        'tensorboard',
+
+        'setuptools==59.5.0',
+    ],
+)
+EOF
+python -m pip install .
