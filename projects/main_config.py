@@ -7,11 +7,11 @@ from torch.cuda import is_available
 # working directory:
 # Logging files, model checkpoints and figures will be saved here and will be loaded from here.
 # If you have already a trained model, put the 'logs' folder into this working_dir.
-working_dir = os.environ.get('WORKING_DIR', '/home/martin/Projekte/OGC_Testbed-18/software/asos_work_dir')
+working_dir = os.environ.get('WORKING_DIR', '/home/jovyan/work/workspace/work_dir')
 
 # anthroprotect data folder:
 # Define the path to the anthroprotect dataset folder.
-data_folder = os.environ.get('DATA_FOLDER', '/home/martin/Projekte/OGC_Testbed-18/data/anthroprotect')
+data_folder = os.environ.get('DATA_FOLDER', '/home/jovyan/work/workspace/data/anthroprotect')
 
 # server url
 # url to external server (API Coverages, ...)
