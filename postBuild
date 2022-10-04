@@ -13,7 +13,9 @@ python -m pip install GDAL==2.2.3
 python -m pip install --no-cache-dir torch
 
 # tlib
+# With original setup.py
 #python -m pip install git+https://gitlab.jsc.fz-juelich.de/kiste/asos@main
+# With adapted setup.py
 cd /tmp
 git clone https://gitlab.jsc.fz-juelich.de/kiste/asos.git
 cd asos
@@ -76,3 +78,6 @@ setup(
 )
 EOF
 python -m pip install .
+
+# Downgrade markupsafe
+python -m pip install markupsafe==2.0.1
