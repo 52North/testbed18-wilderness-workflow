@@ -46,6 +46,7 @@ tlearn.utils.set_random_seed(random_seed=0)
 
 # folders
 working_dir = main_config.working_dir
+data_folder = main_config.data_folder
 log_path = main_config.log_path  # the folder 'version_x' in 'ttorch_logs' must be renamed and moved according to given log_path
 
 data_folder_raw = main_config.anthroprotect_data_folder_raw
