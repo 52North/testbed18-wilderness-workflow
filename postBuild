@@ -83,4 +83,5 @@ python -m pip install .
 python -m pip install markupsafe==2.0.1
 
 # Add workspace to PYTHONPATH to be able to import from local Python package projects
-echo 'export PYTHONPATH="${PYTHONPATH}:/home/jovyan/work/workspace"' >> ~/.profile
+# -> PYTHONPATH is available in new terminals but not in Jupyter notebooks
+#echo 'export PYTHONPATH="${PYTHONPATH}:/home/jovyan/work/workspace"' >> ~/.profile
