@@ -81,3 +81,6 @@ python -m pip install .
 
 # Downgrade markupsafe
 python -m pip install markupsafe==2.0.1
+
+# Add workspace to PYTHONPATH to be able to import from local Python package projects
+echo 'export PYTHONPATH="${PYTHONPATH}:/home/jovyan/work/workspace"' >> ~/.profile
