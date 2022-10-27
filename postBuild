@@ -30,7 +30,7 @@ setup(
     license='MIT',
     author='Timo Tjaden Stomberg',
     author_email='timo.stomberg@uni-bonn.de',
-    url='https://gitlab.com/timo.stomberg/tlib',
+    url='https://gitlab.jsc.fz-juelich.de/kiste/asos',
     packages=[
         'tlib',
 
