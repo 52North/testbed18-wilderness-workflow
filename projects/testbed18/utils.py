@@ -30,33 +30,6 @@ def load_file_infos(raw: bool = False):
     return fi
 
 
-def get_new_datamodule():
-    """
-    Setup new datamodule.
-
-    :return: datamodule object
-    """
-
-    return ttorch.data.images.DataModule(
-        file_infos=load_file_infos(raw=True).df,
-        folder=config.data_folder_tiles,
-
-        channels=config.channels,
-        x_normalization=config.normalization,
-        clip_range=config.clip_range,
-        rotate=True,
-        cutmix=config.cutmix,
-        n_classes=1,
-
-        use_rasterio=True if config.data_type == 'sentinel_2' else False,
-        rgb_channels=[2, 1, 0] if config.data_type == 'sentinel_2' else [0, 1, 2],
-        val_range=(0, 2**10) if config.data_type == 'sentinel_2' else (0, 1),
-
-        batch_size=config.batch_size,
-        num_workers=config.num_workers,
-    )
-
-
 def load_trainer():
     """
     Load trainer from working_dir.
@@ -64,7 +37,7 @@ def load_trainer():
     :return: loaded trainer object
     """
 
-    trainer = ttorch.train.ClassTrainer().load(log_dir=config.log_path, device=config.device)
+    trainer = ttorch.train.load_trainer(log_dir=config.log_path, device=config.device)
     trainer.datamodule.folder = config.data_folder_tiles
     return trainer
 

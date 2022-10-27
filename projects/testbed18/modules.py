@@ -24,7 +24,7 @@ class Model(ttorch.model.Module):
     :param final_activation: activation function of the classifier; can be nn.Sigmoid() or nn.Softmax(dim=1)
     """
 
-    def __init__(
+    def tinit(
             self,
 
             in_channels: int,
@@ -37,12 +37,9 @@ class Model(ttorch.model.Module):
             unet_mode: str,  # 'bilinear', 'nearest' or None
             unet_activation,  # e.g. nn.Tanh()
 
+            dropout: float,  # standard UNet has None
             final_activation,  # nn.Sigmoid() or nn.Softmax(dim=1)
     ):
-
-        super().__init__()
-
-        self.final_activation = final_activation
 
         # unet
         
@@ -52,6 +49,7 @@ class Model(ttorch.model.Module):
             'base_channels': unet_base_channels,
             'batch_norm': batch_norm,
             'double_conv': double_conv,
+            'dropout': dropout,
             'final_activation': unet_activation,
         }
 
@@ -65,21 +63,28 @@ class Model(ttorch.model.Module):
         self.random_occlusion = ttorch.modules.operations.RandomPixelOcclusion(probability=0.2)
 
         # classifier
-        
+
+        dropout = dropout if dropout is not None else 0
+
         self.classifier = nn.Sequential(
+            #  nn.Dropout(p=dropout), do not run because of random occlusions
             nn.Conv2d(n_unet_maps, 2 * n_unet_maps, kernel_size=5, stride=3),
             nn.ReLU(inplace=True),
 
+            nn.Dropout(p=dropout),
             nn.Conv2d(2 * n_unet_maps, 4 * n_unet_maps, kernel_size=5, stride=3),
             nn.ReLU(inplace=True),
 
+            nn.Dropout(p=dropout),
             nn.Conv2d(4 * n_unet_maps, 8 * n_unet_maps, kernel_size=5, stride=3),
             nn.ReLU(inplace=True),
 
             nn.Flatten(),
+            nn.Dropout(p=dropout),
             nn.Linear(512 * n_unet_maps, 128),
             nn.ReLU(inplace=True),
             
+            nn.Dropout(p=dropout),
             nn.Linear(128, n_classes),
         )
 
@@ -113,7 +118,7 @@ class Model(ttorch.model.Module):
 
         pred = self.classifier(unet_map)
 
-        if self.final_activation is not None:
-            pred = self.final_activation(pred)
+        if self.hparams['final_activation'] is not None:
+            pred = self.hparams['final_activation'](pred)
 
         return pred
