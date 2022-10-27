@@ -7,7 +7,7 @@ The source code is based on https://gitlab.jsc.fz-juelich.de/kiste/asos.
 
 ## Prerequisites
 
-To run (parts of) the `41_analyze_samples.ipynb` notebook a pickle file is needed which can be downloaded from http://rs.ipb.uni-bonn.de/downloads/asos/. Because it's relatively large (~0,5 GB) we don't want to store it on GitHub.
+To run (parts of) the `51_analyze_samples.ipynb` notebook a pickle file is needed which can be downloaded from http://rs.ipb.uni-bonn.de/downloads/asos/. Because it's relatively large (~0,5 GB) we don't want to store it on GitHub.
 
 The file `/logs/asos/asos.pkl` in the downloaded `asos_logs.zip` should be placed in `work_dir/logs/asos`.
 
@@ -43,9 +43,9 @@ The repository is configured to run on Whole Tale without any changes needed. To
 
 ## Run workflow
 
-To download samples for analysis run `projects/testbed18/00_download_samples.ipynb`.
+To download samples for analysis run `tjects/experiments/testbed18/00_download_samples.ipynb`.
 
-To predict activation maps and sensitivity maps from Sentinel-2 imagery to analyze wilderness characteristics run `projects/testbed18/41_analyze_samples.ipynb`.
+To predict activation maps and sensitivity maps from Sentinel-2 imagery to analyze wilderness characteristics run `tjects/experiments/testbed18/51_analyze_samples.ipynb`.
 
 ## Additional notes
 
