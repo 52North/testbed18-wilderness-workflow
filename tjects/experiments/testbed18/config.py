@@ -1,7 +1,7 @@
 import warnings
 
 from tlib import tlearn
-from projects import main_config
+from tjects import main_config
 
 
 # You might want to change the parameters in the following box:

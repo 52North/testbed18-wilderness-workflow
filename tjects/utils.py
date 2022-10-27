@@ -1,6 +1,6 @@
 import warnings
 
-from projects import main_config
+from tjects import main_config
 
 
 def print_log_path_warning():

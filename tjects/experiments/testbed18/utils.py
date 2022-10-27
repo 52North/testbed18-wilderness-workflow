@@ -6,7 +6,7 @@ import torch
 from tqdm.auto import tqdm
 
 from tlib import tlearn, ttorch, tgeo, tutils
-from projects.testbed18 import config
+from tjects.experiments.testbed18 import config
 
 
 def load_file_infos(raw: bool = False):
