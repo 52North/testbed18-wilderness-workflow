@@ -19,6 +19,7 @@ python -m pip install --no-cache-dir torch
 cd /tmp
 git clone https://gitlab.jsc.fz-juelich.de/kiste/asos.git
 cd asos
+git checkout v1.0.0-alpha.1
 cat << EOF > setup.py
 from setuptools import setup
 
