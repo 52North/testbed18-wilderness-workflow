@@ -5,6 +5,8 @@ The purpose of the tale is to reproduce (parts of) the scientific study "Explori
 
 The source code is based on https://gitlab.jsc.fz-juelich.de/kiste/asos.
 
+![Sentinel-2 scene with predicted sensitivity map for wilderness](./inv_letsi.png)
+
 ## Prerequisites
 
 To run (parts of) the `51_analyze_samples.ipynb` notebook a pickle file is needed which can be downloaded from http://rs.ipb.uni-bonn.de/downloads/asos/. Because it's relatively large (~0,5 GB) we don't want to store it on GitHub.
