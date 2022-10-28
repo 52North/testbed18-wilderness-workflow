@@ -5,7 +5,7 @@ The purpose of the tale is to reproduce (parts of) the scientific study "Explori
 
 The source code is based on https://gitlab.jsc.fz-juelich.de/kiste/asos.
 
-![Sentinel-2 scene with predicted sensitivity map for wilderness](./inv_letsi.png)
+![Sentinel-2 scene with predicted sensitivity map for wilderness](./img/inv_letsi.png)
 
 ## Prerequisites
 
