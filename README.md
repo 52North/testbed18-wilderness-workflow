@@ -45,10 +45,14 @@ The repository is configured to run on Whole Tale without any changes needed. To
 
 ## Run workflow
 
-To download samples for analysis run `tjects/experiments/testbed18/00_download_samples.ipynb`.
+To download samples for analysis (in notebook `51_analyze_samples.ipynb`) run `tjects/experiments/testbed18/00_download_samples.ipynb`.
+
+To analyze the activation space run `tjects/experiments/testbed18/
+4_analyze_activation_space.ipynb`.
 
 To predict activation maps and sensitivity maps from Sentinel-2 imagery to analyze wilderness characteristics run `tjects/experiments/testbed18/51_analyze_samples.ipynb`.
 
 ## Additional notes
 
 * The asos folder (with only `__init__.py` and `modules.py`) needs to be in place to unpickle the model checkpoints.
+* There are some memory limitation when running a tale on Whole Tale. If the kernel crashes during `51_analyze_samples.ipynb`try to use a smaller sample.
