@@ -59,7 +59,7 @@ setup(
         'ipympl',
         'tqdm',
 
-        'jupyter_contrib_nbextensions',
+        'jupyter_contrib_nbextensions==0.5.1',
 
         'rasterio',
         'imageio',
